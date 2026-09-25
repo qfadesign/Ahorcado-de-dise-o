@@ -240,6 +240,43 @@
       border-radius:5px;
     }
 
+
+    .timer-wrap{
+      width:100%;
+      max-width:430px;
+      margin:0 auto 17px;
+    }
+    .timer-line{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      color:var(--muted);
+      font-size:11px;
+      font-weight:700;
+      margin-bottom:6px;
+    }
+    .timer-number{
+      color:var(--black);
+      font-size:13px;
+      font-weight:800;
+    }
+    .timer-bar{
+      width:100%;
+      height:7px;
+      background:#e9edf4;
+      border-radius:99px;
+      overflow:hidden;
+    }
+    .timer-fill{
+      width:100%;
+      height:100%;
+      background:var(--blue);
+      border-radius:99px;
+      transition:width .1s linear;
+    }
+    .timer-fill.warning{background:var(--blue-light)}
+    .timer-fill.danger{background:var(--blue-dark)}
+
     .lives{
       text-align:center;
       color:var(--muted);
@@ -476,6 +513,16 @@
           </div>
         </div>
 
+        <div class="timer-wrap">
+          <div class="timer-line">
+            <span>Tiempo</span>
+            <span class="timer-number" id="timerText">25s</span>
+          </div>
+          <div class="timer-bar">
+            <div class="timer-fill" id="timerFill"></div>
+          </div>
+        </div>
+
         <div class="lives">
           Vidas:
           <span class="hearts" id="hearts">● ● ● ● ● ●</span>
@@ -484,7 +531,7 @@
         <div class="word" id="word"></div>
 
         <div class="hint" id="hint">
-          Pista: concepto de diseño gráfico
+          Pista: concepto, escuela o movimiento de diseño
         </div>
 
         <div class="message" id="message">
@@ -521,7 +568,36 @@
       {word:"composicion", hint:"Organización de los elementos dentro de una pieza."},
       {word:"proporcion", hint:"Relación de tamaño entre diferentes elementos."},
       {word:"alineacion", hint:"Forma en que se ordenan y relacionan los elementos."},
-      {word:"simetria", hint:"Correspondencia equilibrada entre partes de una composición."}
+      {word:"simetria", hint:"Correspondencia equilibrada entre partes de una composición."},
+      {word:"grilla", hint:"Sistema de líneas que ayuda a estructurar una composición."},
+      {word:"espacio", hint:"Área vacía que ayuda a organizar los elementos."},
+      {word:"ritmo", hint:"Repetición y variación que genera movimiento visual."},
+      {word:"escala", hint:"Relación de tamaño entre elementos o respecto de un formato."},
+      {word:"forma", hint:"Elemento visual definido por contorno, superficie o volumen."},
+      {word:"linea", hint:"Elemento gráfico fundamental que construye formas y direcciones."},
+      {word:"modulo", hint:"Unidad que puede repetirse para construir una composición."},
+      {word:"patron", hint:"Repetición organizada de elementos visuales."},
+      {word:"croma", hint:"Característica relacionada con la intensidad o pureza de un color."},
+      {word:"icono", hint:"Signo visual que representa una idea, objeto o acción."},
+      {word:"signo", hint:"Elemento que comunica o representa un significado."},
+      {word:"marca", hint:"Identidad visual que distingue una organización o producto."},
+      {word:"identidad", hint:"Sistema visual que construye el reconocimiento de una marca."},
+      {word:"afiche", hint:"Pieza gráfica destinada principalmente a comunicar un mensaje."},
+      {word:"editorial", hint:"Área del diseño relacionada con publicaciones y contenidos."},
+
+      {word:"bauhaus", hint:"Escuela alemana fundada en 1919 que integró arte, diseño y arquitectura."},
+      {word:"ulm", hint:"Escuela alemana de diseño fundada en 1953, vinculada al diseño racional y sistemático."},
+      {word:"destijl", hint:"Movimiento neerlandés asociado a la abstracción geométrica."},
+      {word:"vkhutemas", hint:"Escuela soviética de arte y diseño activa en Moscú durante la década de 1920."},
+      {word:"memphis", hint:"Grupo italiano de diseño surgido en 1981, conocido por formas y colores expresivos."},
+      {word:"cranbrook", hint:"Academia estadounidense vinculada a importantes desarrollos del diseño moderno."},
+      {word:"artscrafts", hint:"Movimiento británico que defendió la artesanía frente a la industrialización."},
+      {word:"artnouveau", hint:"Movimiento de fines del siglo XIX caracterizado por líneas orgánicas y ornamentación."},
+      {word:"artdeco", hint:"Estilo de las décadas de 1920 y 1930 asociado a geometría y ornamentación."},
+      {word:"constructivismo", hint:"Vanguardia rusa con gran influencia en la gráfica y la comunicación visual."},
+      {word:"futurismo", hint:"Vanguardia italiana que influyó en la tipografía y composición gráfica."},
+      {word:"dadaismo", hint:"Movimiento de vanguardia que cuestionó las convenciones artísticas y visuales."},
+      {word:"internacional", hint:"Estilo gráfico asociado a claridad, retículas y tipografía sans serif."}
     ];
 
     const MAX_LIVES = 6;
@@ -542,6 +618,9 @@
     let score = 0;
     let locked = false;
     let previousWords = [];
+    let timer = null;
+    let roundStart = 0;
+    const ROUND_TIME = 25;
 
     const gameContent = document.getElementById("gameContent");
     const finalScreen = document.getElementById("finalScreen");
@@ -553,6 +632,8 @@
     const scoreEl = document.getElementById("scoreText");
     const roundEl = document.getElementById("roundText");
     const finalScoreEl = document.getElementById("finalScore");
+    const timerText = document.getElementById("timerText");
+    const timerFill = document.getElementById("timerFill");
     const playAgain = document.getElementById("playAgain");
 
     function normalize(value){
@@ -674,6 +755,38 @@
       return 100 + lives * 25;
     }
 
+
+    function startTimer(){
+      clearInterval(timer);
+      roundStart = performance.now();
+      timerText.textContent = `${ROUND_TIME}s`;
+      timerFill.style.width = "100%";
+      timerFill.classList.remove("warning","danger");
+
+      timer = setInterval(() => {
+        const elapsed = (performance.now() - roundStart) / 1000;
+        const remaining = Math.max(0, ROUND_TIME - elapsed);
+
+        timerText.textContent = `${Math.ceil(remaining)}s`;
+        timerFill.style.width = `${(remaining / ROUND_TIME) * 100}%`;
+        timerFill.classList.toggle("warning", remaining <= 12 && remaining > 6);
+        timerFill.classList.toggle("danger", remaining <= 6);
+
+        if(remaining <= 0){
+          clearInterval(timer);
+          timeOut();
+        }
+      }, 50);
+    }
+
+    function timeOut(){
+      if(locked) return;
+      locked = true;
+      revealAnswer();
+      showMessage(`Se acabó el tiempo. Era ${answer.toUpperCase()}.`, "error");
+      setTimeout(nextRound, 1300);
+    }
+
     function guessLetter(letter){
       if(locked || guessed.has(letter) || wrongLetters.has(letter)) return;
 
@@ -754,6 +867,7 @@
       updateLives();
       updateHangman();
       showMessage("Elegí una letra.");
+      startTimer();
     }
 
     function finishGame(){
