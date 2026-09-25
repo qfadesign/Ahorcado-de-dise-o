@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conceptos de diseño</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --blue:#4569e8;
+      --blue-dark:#3658cf;
+      --blue-light:#a9c9ff;
+      --black:#111827;
+      --muted:#718096;
+      --bg:#f6f7fb;
+      --white:#fff;
+      --line:#dfe4ed;
+      --key:#e9edf4;
+      --wrong:#d8dde6;
+      --danger:#6d7788;
+    }
+
+    *{box-sizing:border-box}
+
+    html,body{
+      margin:0;
+      min-height:100%;
+      background:var(--bg);
+      color:var(--black);
+      font-family:"Montserrat",Arial,sans-serif;
+    }
+
+    body{
+      min-height:100vh;
+      display:flex;
+      justify-content:center;
+    }
+
+    button{
+      font:inherit;
+      font-family:"Montserrat",Arial,sans-serif;
+      border:0;
+      cursor:pointer;
+    }
+
+    .app{
+      width:100%;
+      max-width:760px;
+      min-height:100vh;
+      padding:30px 18px 40px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+    }
+
+    .header{
+      text-align:center;
+      margin-bottom:22px;
+    }
+
+    .eyebrow{
+      color:var(--blue);
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:.09em;
+      text-transform:uppercase;
+      margin-bottom:7px;
+    }
+
+    h1{
+      margin:0;
+      font-size:clamp(27px,5vw,38px);
+      line-height:1;
+      font-weight:800;
+      letter-spacing:-.055em;
+    }
+
+    .subtitle{
+      margin:9px 0 0;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.5;
+    }
+
+    .game-card{
+      width:100%;
+      max-width:650px;
+      background:var(--white);
+      border:1px solid var(--line);
+      border-radius:24px;
+      box-shadow:0 18px 45px rgba(36,48,80,.09);
+      padding:27px 25px 25px;
+    }
+
+    .top-info{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:15px;
+      color:var(--muted);
+      font-size:11px;
+      font-weight:600;
+      margin-bottom:16px;
+    }
+
+    .top-info strong{
+      color:var(--black);
+    }
+
+    .score{
+      color:var(--blue-dark);
+      font-weight:800;
+    }
+
+    .hangman-area{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height:145px;
+      margin:0 auto 15px;
+    }
+
+    .hangman{
+      width:180px;
+      height:145px;
+      position:relative;
+    }
+
+    .gallows{
+      position:absolute;
+      left:17px;
+      bottom:10px;
+      width:115px;
+      height:4px;
+      border-radius:4px;
+      background:#cdd4df;
+    }
+
+    .gallows::before{
+      content:"";
+      position:absolute;
+      left:18px;
+      bottom:0;
+      width:4px;
+      height:125px;
+      background:#cdd4df;
+      border-radius:4px;
+    }
+
+    .gallows::after{
+      content:"";
+      position:absolute;
+      left:18px;
+      top:0;
+      width:82px;
+      height:4px;
+      background:#cdd4df;
+      border-radius:4px;
+    }
+
+    .rope{
+      position:absolute;
+      left:100px;
+      top:0;
+      width:4px;
+      height:18px;
+      background:#cdd4df;
+      border-radius:4px;
+    }
+
+    .part{
+      position:absolute;
+      display:none;
+      background:var(--blue);
+    }
+
+    .part.show{
+      display:block;
+    }
+
+    .head{
+      left:88px;
+      top:15px;
+      width:29px;
+      height:29px;
+      border:4px solid var(--blue);
+      border-radius:50%;
+      background:#fff;
+    }
+
+    .body{
+      left:100px;
+      top:43px;
+      width:5px;
+      height:47px;
+      border-radius:5px;
+    }
+
+    .arm-left{
+      left:74px;
+      top:51px;
+      width:31px;
+      height:5px;
+      transform:rotate(-28deg);
+      transform-origin:right center;
+      border-radius:5px;
+    }
+
+    .arm-right{
+      left:101px;
+      top:51px;
+      width:31px;
+      height:5px;
+      transform:rotate(28deg);
+      transform-origin:left center;
+      border-radius:5px;
+    }
+
+    .leg-left{
+      left:98px;
+      top:85px;
+      width:5px;
+      height:34px;
+      transform:rotate(35deg);
+      transform-origin:top center;
+      border-radius:5px;
+    }
+
+    .leg-right{
+      left:102px;
+      top:85px;
+      width:5px;
+      height:34px;
+      transform:rotate(-35deg);
+      transform-origin:top center;
+      border-radius:5px;
+    }
+
+    .lives{
+      text-align:center;
+      color:var(--muted);
+      font-size:12px;
+      font-weight:700;
+      margin-bottom:20px;
+    }
+
+    .hearts{
+      color:var(--blue);
+      letter-spacing:3px;
+      font-size:14px;
+      margin-left:5px;
+    }
+
+    .hearts .lost{
+      color:#dce1e9;
+    }
+
+    .word{
+      display:flex;
+      justify-content:center;
+      flex-wrap:wrap;
+      gap:8px;
+      margin:0 auto 17px;
+      max-width:580px;
+    }
+
+    .letter{
+      width:38px;
+      height:46px;
+      border-bottom:3px solid #cbd3df;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:20px;
+      font-weight:800;
+      text-transform:uppercase;
+    }
+
+    .letter.space{
+      width:18px;
+      border-bottom:0;
+    }
+
+    .letter.revealed{
+      color:var(--blue-dark);
+      border-bottom-color:var(--blue-dark);
+    }
+
+    .hint{
+      text-align:center;
+      min-height:21px;
+      margin-bottom:16px;
+      color:var(--muted);
+      font-size:11px;
+      font-weight:600;
+    }
+
+    .message{
+      min-height:23px;
+      text-align:center;
+      margin-bottom:13px;
+      color:var(--muted);
+      font-size:12px;
+      font-weight:700;
+    }
+
+    .message.success{color:var(--blue-dark)}
+    .message.error{color:#697386}
+
+    .keyboard{
+      width:100%;
+      max-width:550px;
+      margin:0 auto;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+
+    .key-row{
+      display:flex;
+      gap:5px;
+      justify-content:center;
+    }
+
+    .key{
+      flex:1;
+      min-width:0;
+      height:47px;
+      border-radius:8px;
+      background:var(--key);
+      color:#344054;
+      font-size:12px;
+      font-weight:800;
+      transition:.12s ease;
+    }
+
+    .key:hover:not(:disabled){
+      background:#dfe5ee;
+    }
+
+    .key.correct{
+      background:var(--blue-dark);
+      color:#fff;
+    }
+
+    .key.wrong{
+      background:var(--wrong);
+      color:#9aa2b0;
+      text-decoration:line-through;
+    }
+
+    .key:disabled{
+      cursor:default;
+    }
+
+    .final-screen{
+      display:none;
+      text-align:center;
+      padding:15px 5px 5px;
+    }
+
+    .final-screen.show{
+      display:block;
+    }
+
+    .final-label{
+      color:var(--blue);
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:.09em;
+      text-transform:uppercase;
+    }
+
+    .final-title{
+      margin:9px 0 5px;
+      font-size:30px;
+      line-height:1.05;
+      font-weight:800;
+      letter-spacing:-.05em;
+    }
+
+    .final-score{
+      color:var(--blue);
+      font-size:54px;
+      line-height:1;
+      font-weight:800;
+      letter-spacing:-.06em;
+      margin:14px 0 8px;
+    }
+
+    .final-copy{
+      color:var(--muted);
+      font-size:12px;
+      margin:0 0 22px;
+    }
+
+    .play-again{
+      background:var(--blue);
+      color:#fff;
+      border-radius:10px;
+      padding:13px 22px;
+      font-size:12px;
+      font-weight:800;
+      box-shadow:0 7px 16px rgba(69,105,232,.18);
+    }
+
+    .play-again:hover{
+      background:var(--blue-dark);
+    }
+
+    @media(max-width:520px){
+      .app{
+        padding:22px 12px 28px;
+      }
+
+      .game-card{
+        padding:22px 13px 20px;
+        border-radius:20px;
+      }
+
+      .hangman-area{
+        min-height:125px;
+      }
+
+      .hangman{
+        transform:scale(.88);
+      }
+
+      .letter{
+        width:31px;
+        height:42px;
+        font-size:18px;
+      }
+
+      .word{
+        gap:6px;
+      }
+
+      .key{
+        height:45px;
+        font-size:10px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="app">
+    <header class="header">
+      <div class="eyebrow">JUEGO DE DISEÑO</div>
+      <h1>El ahorcado del diseño</h1>
+      <p class="subtitle">Adiviná conceptos de diseño gráfico letra por letra.</p>
+    </header>
+
+    <section class="game-card">
+      <div id="gameContent">
+        <div class="top-info">
+          <span id="roundText">Ronda 1 / 5</span>
+          <span class="score" id="scoreText">0 pts</span>
+        </div>
+
+        <div class="hangman-area">
+          <div class="hangman" aria-label="Ahorcado">
+            <div class="gallows"></div>
+            <div class="rope"></div>
+            <div class="part head" data-part="1"></div>
+            <div class="part body" data-part="2"></div>
+            <div class="part arm-left" data-part="3"></div>
+            <div class="part arm-right" data-part="4"></div>
+            <div class="part leg-left" data-part="5"></div>
+            <div class="part leg-right" data-part="6"></div>
+          </div>
+        </div>
+
+        <div class="lives">
+          Vidas:
+          <span class="hearts" id="hearts">● ● ● ● ● ●</span>
+        </div>
+
+        <div class="word" id="word"></div>
+
+        <div class="hint" id="hint">
+          Pista: concepto de diseño gráfico
+        </div>
+
+        <div class="message" id="message">
+          Elegí una letra.
+        </div>
+
+        <div class="keyboard" id="keyboard"></div>
+      </div>
+
+      <div class="final-screen" id="finalScreen">
+        <div class="final-label">Partida terminada</div>
+        <div class="final-title">¡Terminaste las 5 rondas!</div>
+        <div class="final-score" id="finalScore">0 pts</div>
+        <p class="final-copy">Tu puntaje total en el ahorcado del diseño.</p>
+        <button class="play-again" id="playAgain">Jugar de nuevo</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    /*
+      Conceptos de diseño gráfico.
+      Se usan palabras sin tildes para que el teclado sea sencillo.
+    */
+    const CONCEPTS = [
+      {word:"tipografia", hint:"Sistema y elección de letras en una pieza."},
+      {word:"contraste", hint:"Diferencia visual entre elementos."},
+      {word:"reticula", hint:"Estructura que organiza una composición."},
+      {word:"jerarquia", hint:"Orden de importancia visual de los elementos."},
+      {word:"paleta", hint:"Conjunto de colores usados en un diseño."},
+      {word:"textura", hint:"Cualidad visual o táctil de una superficie."},
+      {word:"logotipo", hint:"Representación gráfica basada principalmente en letras."},
+      {word:"vector", hint:"Gráfico definido mediante formas y trazados matemáticos."},
+      {word:"composicion", hint:"Organización de los elementos dentro de una pieza."},
+      {word:"proporcion", hint:"Relación de tamaño entre diferentes elementos."},
+      {word:"alineacion", hint:"Forma en que se ordenan y relacionan los elementos."},
+      {word:"simetria", hint:"Correspondencia equilibrada entre partes de una composición."}
+    ];
+
+    const MAX_LIVES = 6;
+    const TOTAL_ROUNDS = 5;
+
+    const KEY_ROWS = [
+      ["Q","W","E","R","T","Y","U","I","O","P"],
+      ["A","S","D","F","G","H","J","K","L","Ñ"],
+      ["Z","X","C","V","B","N","M"]
+    ];
+
+    let answer = "";
+    let hint = "";
+    let guessed = new Set();
+    let wrongLetters = new Set();
+    let lives = MAX_LIVES;
+    let round = 1;
+    let score = 0;
+    let locked = false;
+    let previousWords = [];
+
+    const gameContent = document.getElementById("gameContent");
+    const finalScreen = document.getElementById("finalScreen");
+    const wordEl = document.getElementById("word");
+    const hintEl = document.getElementById("hint");
+    const messageEl = document.getElementById("message");
+    const keyboardEl = document.getElementById("keyboard");
+    const heartsEl = document.getElementById("hearts");
+    const scoreEl = document.getElementById("scoreText");
+    const roundEl = document.getElementById("roundText");
+    const finalScoreEl = document.getElementById("finalScore");
+    const playAgain = document.getElementById("playAgain");
+
+    function normalize(value){
+      return value
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+    }
+
+    function chooseConcept(){
+      let available = CONCEPTS.filter(c => !previousWords.includes(c.word));
+
+      if(!available.length){
+        previousWords = [];
+        available = CONCEPTS;
+      }
+
+      const concept = available[Math.floor(Math.random() * available.length)];
+
+      previousWords.push(concept.word);
+      answer = normalize(concept.word);
+      hint = concept.hint;
+    }
+
+    function createKeyboard(){
+      keyboardEl.innerHTML = "";
+
+      KEY_ROWS.forEach(row => {
+        const rowEl = document.createElement("div");
+        rowEl.className = "key-row";
+
+        row.forEach(letter => {
+          const key = document.createElement("button");
+          key.className = "key";
+          key.textContent = letter;
+          key.dataset.letter = normalize(letter);
+
+          key.addEventListener("click", () => guessLetter(normalize(letter)));
+
+          rowEl.appendChild(key);
+        });
+
+        keyboardEl.appendChild(rowEl);
+      });
+    }
+
+    function renderWord(){
+      wordEl.innerHTML = "";
+
+      for(let i = 0; i < answer.length; i++){
+        const char = answer[i];
+        const letter = document.createElement("div");
+
+        if(char === " "){
+          letter.className = "letter space";
+        }else{
+          letter.className = "letter";
+
+          if(guessed.has(char)){
+            letter.textContent = char.toUpperCase();
+            letter.classList.add("revealed");
+          }
+        }
+
+        wordEl.appendChild(letter);
+      }
+    }
+
+    function updateLives(){
+      let html = "";
+
+      for(let i = 0; i < MAX_LIVES; i++){
+        html += i < lives
+          ? "● "
+          : '<span class="lost">●</span> ';
+      }
+
+      heartsEl.innerHTML = html.trim();
+    }
+
+    function updateHangman(){
+      document.querySelectorAll(".part").forEach(part => {
+        const number = Number(part.dataset.part);
+        part.classList.toggle("show", number <= (MAX_LIVES - lives));
+      });
+    }
+
+    function updateKeyboard(letter, state){
+      const key = keyboardEl.querySelector(`[data-letter="${letter}"]`);
+
+      if(!key) return;
+
+      key.disabled = true;
+      key.classList.remove("correct","wrong");
+
+      if(state === "correct"){
+        key.classList.add("correct");
+      }else{
+        key.classList.add("wrong");
+      }
+    }
+
+    function showMessage(text, type = ""){
+      messageEl.textContent = text;
+      messageEl.className = "message";
+
+      if(type){
+        messageEl.classList.add(type);
+      }
+    }
+
+    function allLettersFound(){
+      return [...new Set(answer.replace(/[^a-zñ]/g, ""))]
+        .every(letter => guessed.has(letter));
+    }
+
+    function calculateRoundPoints(){
+      // Más puntos si se acierta con más vidas restantes.
+      return 100 + lives * 25;
+    }
+
+    function guessLetter(letter){
+      if(locked || guessed.has(letter) || wrongLetters.has(letter)) return;
+
+      if(answer.includes(letter)){
+        guessed.add(letter);
+        updateKeyboard(letter, "correct");
+        renderWord();
+
+        if(allLettersFound()){
+          locked = true;
+          const points = calculateRoundPoints();
+          score += points;
+          scoreEl.textContent = `${score} pts`;
+          showMessage(`¡Correcto! +${points} puntos`, "success");
+
+          setTimeout(nextRound, 1100);
+        }else{
+          showMessage("¡Está! No perdés ninguna vida.", "success");
+        }
+      }else{
+        wrongLetters.add(letter);
+        lives--;
+
+        updateKeyboard(letter, "wrong");
+        updateLives();
+        updateHangman();
+
+        if(lives <= 0){
+          locked = true;
+          revealAnswer();
+
+          showMessage(
+            `Te quedaste sin vidas. Era ${answer.toUpperCase()}.`,
+            "error"
+          );
+
+          setTimeout(nextRound, 1400);
+        }else{
+          showMessage(`La letra ${letter.toUpperCase()} no está.`, "error");
+        }
+      }
+    }
+
+    function revealAnswer(){
+      answer.split("").forEach(letter => {
+        if(letter !== " "){
+          guessed.add(letter);
+        }
+      });
+
+      renderWord();
+    }
+
+    function nextRound(){
+      if(round >= TOTAL_ROUNDS){
+        finishGame();
+        return;
+      }
+
+      round++;
+      startRound();
+    }
+
+    function startRound(){
+      locked = false;
+      guessed = new Set();
+      wrongLetters = new Set();
+      lives = MAX_LIVES;
+
+      chooseConcept();
+
+      roundEl.textContent = `Ronda ${round} / ${TOTAL_ROUNDS}`;
+      scoreEl.textContent = `${score} pts`;
+      hintEl.textContent = `Pista: ${hint}`;
+
+      createKeyboard();
+      renderWord();
+      updateLives();
+      updateHangman();
+      showMessage("Elegí una letra.");
+    }
+
+    function finishGame(){
+      gameContent.style.display = "none";
+      finalScreen.classList.add("show");
+      finalScoreEl.textContent = `${score} pts`;
+    }
+
+    function restartGame(){
+      round = 1;
+      score = 0;
+      previousWords = [];
+
+      gameContent.style.display = "";
+      finalScreen.classList.remove("show");
+
+      startRound();
+    }
+
+    document.addEventListener("keydown", event => {
+      if(locked) return;
+
+      const key = normalize(event.key);
+
+      if(/^[a-zñ]$/.test(key)){
+        guessLetter(key);
+      }
+    });
+
+    playAgain.addEventListener("click", restartGame);
+
+    startRound();
+  </script>
+</body>
+</html>
